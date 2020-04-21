@@ -79,26 +79,20 @@ workflows:
             - codecov/upload:
                 file: ./coverage/lcov.info
 
-      # staging
-      - hokusai/push:
-          name: push-staging-image
-          <<: *only_master
-          requires:
-            - test
-
       - hokusai/deploy-staging:
           name: deploy-staging
           <<: *only_master
           project-name: metaphysics
           requires:
-            - push-staging-image
+            - test
+          pre-steps:
+            - hokusai/push-image
 
       - push-schema-changes:
           <<: *only_master
           context: hokusai
           requires:
-            - push-staging-image
-            - deploy-staging
+            - test
 
       # release
       - hokusai/deploy-production:
